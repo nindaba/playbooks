@@ -1,0 +1,42 @@
+- set_fact:
+    crs: >-
+      {{ vars[role_env.file]
+        | dict2items
+          | map(attribute="value")
+          | list
+          | first
+          | json_query('[?role==`member`]')
+          | map(attribute='users')
+          | first
+       }}
+
+- set_fact:
+    users_nnis_obj: >-
+      {{ ( users_nnis_obj | default({})) 
+          | combine({ 
+            user_nni: {
+              'nni': user_nni
+              }
+          })
+       }}
+
+  loop: "{{ crs | reject('in', users_nnis_obj) | list}}"
+  loop_control:
+    loop_var: user_nni 
+
+
+- set_fact:
+    users_nnis_obj: >-
+      {{ users_nnis_obj 
+        | default({})
+        | combine({
+            user_nni: users_nnis_obj[user_nni] | combine({role_env.env: role_env.file})
+        })
+      }}
+
+  loop: "{{ crs }}"
+  loop_control:
+    loop_var: user_nni 
+
+
+

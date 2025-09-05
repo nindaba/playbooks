@@ -1,0 +1,105 @@
+- set_fact:
+    envs:
+      - dev
+      - prod
+    role:
+      - file: dev
+        role: dev
+      - file: aud
+        role: aud
+    dev: 
+      crs:
+        - role: member
+          users:
+          - A3
+          - AB
+          - AD
+        - roles:
+          - audi
+          - execute
+          team: EX
+    aud: 
+      crs:
+        - role: member
+          users:
+          - A3
+          - AB
+          - AD
+        - roles:
+          - audi
+          - execute
+          team: EX
+
+- block:
+    - debug:
+        var: env
+  loop: "{{ envs }}"
+  loop_control:
+    loop_var: env
+
+- set_fact:
+    users_nnis_obj: {
+            "A3": {
+                "nni": "A10"
+            },
+            "AB": {
+                "nni": "AB"
+            },
+            "A11": {
+                "nni": "A11"
+            }
+        }
+    rf:
+      crs:
+        - role: member
+          users:
+          - A3
+          - AB
+          - AD
+        - roles:
+          - audi
+          - execute
+          team: EX
+
+- set_fact:
+    crs: >-
+      {{ rf
+        | dict2items
+          | map(attribute="value")
+          | list
+          | first
+          | json_query('[?role==`member`]')
+          | map(attribute='users')
+          | first
+       }}
+
+- set_fact:
+    users_nnis_obj: >-
+      {{ users_nnis_obj 
+        | default({}) 
+        | combine({ 
+          user_nni: {
+            'nni': user_nni
+            }
+        }
+        )
+       }}
+
+  loop: "{{ crs | reject('in', users_nnis_obj) | list}}"
+  loop_control:
+    loop_var: user_nni 
+
+
+- set_fact:
+    users_nnis_obj: >-
+      {{ users_nnis_obj 
+        | combine({
+            user_nni: users_nnis_obj[user_nni] | combine({'prod': 'role'})
+        })
+      }}
+
+  loop: "{{ crs }}"
+  loop_control:
+    loop_var: user_nni 
+
+

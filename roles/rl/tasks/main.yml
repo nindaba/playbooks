@@ -1,0 +1,46 @@
+---
+- set_fact:
+    users_nnis_obj: {}
+    envs:
+        - dev
+        - prod
+    role_files:
+      - file: dev
+        role: dev
+      - file: aud
+        role: aud
+    dev: 
+      crs:
+        - role: member
+          users:
+          - A3
+          - AB
+          - A11
+        - roles:
+          - audi
+          - execute
+          team: EX
+    aud: 
+      crs:
+        - role: member
+          users:
+          - A3
+          - AB
+          - AD
+        - roles:
+          - audi
+          - execute
+          team: EX
+
+- set_fact:
+    roles: >-
+      {{ roles | default([]) + (role_files | map('combine', { 'env': env} ) | list) }}
+  loop: "{{ envs }}"
+  loop_control:
+    loop_var: env
+
+- include_tasks: roler.yml
+  loop: "{{ roles }}"
+  loop_control:
+    loop_var: role_env
+

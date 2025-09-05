@@ -1,0 +1,19 @@
+- name: Test
+  hosts: localhost
+  gather_facts: false
+  vars:
+    desc: |
+      Extra Variables
+      '
+      ---
+
+      hello: arthur
+      msg: welcome to tests'
+  #tasks:
+  #  - include_tasks: date.yml
+  #tasks:
+  #  - include_tasks: roles.yml
+
+  roles:
+    - role: rl
+

@@ -1,0 +1,8 @@
+- name: Date Time
+  set_fact:
+    x_timestamp: >-
+      {{ now() }}
+- name: Log Time
+  debug:
+    var: x_timestamp
+  when: x_timestamp | default != ''

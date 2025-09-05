@@ -1,0 +1,13 @@
+
+  - name: Extract content after "Extra Variables"
+    set_fact:
+      after_extra: "{{ desc.split('Extra Variables')[1] | default('') }}"
+      
+  - name: Parse quoted block as YAML
+    set_fact:
+      parsed_yaml: "{{ after_extra.split(\"'\")[1] | from_yaml }}"
+
+  - name: Regexp
+    debug: 
+      var: parsed_yaml
+    
