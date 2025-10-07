@@ -1,7 +1,7 @@
 - set_fact:
     crs: >-
       {{ vars[role_env.file]
-        | dict2items
+          | dict2items
           | map(attribute="value")
           | list
           | first
